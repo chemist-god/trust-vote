@@ -93,7 +93,7 @@ These challenges undermine trust in democracy, especially in large-scale electio
 
 ## 🛠 Technologies Used
 
-- **Blockchain Frameworks**: Ethereum, Polygon (Layer-2)
+- **Blockchain Frameworks**: Ethereum, Lisk (Layer-2)
 - **Smart Contracts**: Solidity
 - **Front-End**: React.js
 - **Back-End**: Node.js
