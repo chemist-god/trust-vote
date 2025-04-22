@@ -22,6 +22,22 @@ const Hero = () => {
         "dark:[background-image:linear-gradient(to_right,rgba(38,38,38,0.2)_1px,transparent_1px),linear-gradient(to_bottom,rgba(38,38,38,0.2)_1px,transparent_1px)]",
       )}
       />
+      {/* Background video for the hero section */}
+      <div className="relative h-screen w-screen">
+
+       <video
+        className='absolute width-full h-full object-cover z-0 transform scale-x-[-1.5]'
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        >
+        <source src="/assets/file.mp4" type="video/mp4" />
+        This video can&apos;t be played in your browser.
+      </video>
+        </div>
+
       {/* Radial gradient for the container to give a faded look */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black">
       </div>
@@ -32,16 +48,16 @@ const Hero = () => {
 
         <div className='flex justify-center relative my-20 z-10'>
             <div className='max-w-[89vw] md:max-w-2xl lg:max-w-[60vw] flex flex-col  items-center justify-center'>
-                <h2 className='uppercase tracking-widest text-xs text-center text-blue-100 max-w-80'>
+                <h2 className='uppercase tracking-widest text-s text-center text-blue-100 max-w-80'>
                     Trust vote
                 </h2>
                  <TextGenerateEffect 
                  className="text-center text-[40px] md:text-5xl lg:text-6xl"
-                 words="A Decentralised Blockchain Voting DAPP"
+                 words="A Decentralized Blockchain Voting DAPP"
                 /> 
 
                 <p className='text-center md:tracking-wider mb-4 text-sm md:text-lg lg:text-lg text-gray-400 mt-4'>
-                    A decentralized voting application that ensures transparency, security, and trust for SRC electoral process. Built on the Ethereum blockchain, it empowers users to cast their votes with confidence, knowing that their choices are immutable and verifiable.
+                Fostering global inclusion by enabling individuals to engage in decision-making through secure, transparent, and decentralized technologies.
 
                 </p>
                 
