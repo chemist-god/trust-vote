@@ -1,9 +1,11 @@
+
+import SignInCandidate from '@/components/Signin-Candidate'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      Welcome to Candidate Page
+      <SignInCandidate />
     </div>
   )
 }
