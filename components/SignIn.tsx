@@ -1,27 +1,61 @@
 "use client"
 import React, { useState } from 'react';
 import { FaUser, FaLock } from 'react-icons/fa';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const SignIn: React.FC = () => {
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!studentId.trim()) {
-      alert('Student ID cannot be empty');
+      toast.error('Student ID cannot be empty', {
+        position: 'top-center',
+        style: {
+          background: '#ff4444',
+          color: '#fff',
+        },
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      toast.error('Password cannot be empty', {
+        position: 'top-center',
+        style: {
+          background: '#ff4444',
+          color: '#fff',
+        },
+      });
       return;
     }
 
     setLoading(true);
+    toast.loading('Signing in...', {
+      position: 'top-center',
+      id: 'signin-loading',
+    });
 
     setTimeout(() => {
       console.log('Signed in with:', { studentId, password });
       setStudentId('');
       setPassword('');
       setLoading(false);
+      
+      toast.success('Signed in successfully!', {
+        position: 'top-center',
+        id: 'signin-loading', 
+        style: {
+          background: '#00C851',
+          color: '#fff',
+        },
+      });
+      router.push(`/dashboard?studentId=${encodeURIComponent(studentId)}`);// Redirect to /dashboard after sign in
     }, 1500);
   };
 
@@ -35,7 +69,7 @@ const SignIn: React.FC = () => {
           <div className="relative">
             <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-              type="number"
+              type="text" // Changed from number to text to handle input more gracefully
               placeholder="Student ID"
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
@@ -75,4 +109,3 @@ const SignIn: React.FC = () => {
 };
 
 export default SignIn;
-
