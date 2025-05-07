@@ -1,9 +1,10 @@
 import React from 'react'
+import FAQ_Terms from '@/components/FAQ-Terms'
 
 const page = () => {
   return (
     <div>
-        Frequently Asked questions
+        <FAQ_Terms/>
     </div>
   )
 }
