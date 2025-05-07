@@ -1,27 +1,61 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { FaUser, FaLock } from "react-icons/fa";
 
 const SignInCandidate: React.FC = () => {
   const [candidateId, setCandidateId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!candidateId.trim()) {
-      alert("Candidate ID cannot be empty");
+      toast.error('Student ID cannot be empty', {
+        position: 'top-center',
+        style: {
+          background: '#ff4444',
+          color: '#fff',
+        },
+      });
       return;
     }
 
+    if (!password.trim()) {
+      toast.error('Password cannot be empty', {
+        position: 'top-center',
+        style: {
+          background: '#ff4444',
+          color: '#fff',
+        },
+      });
+      return;
+    }
+
+
     setLoading(true);
+    toast.loading("Signing in...", {
+      position: "top-center",
+      id: "signin-loading",
+    });
 
     setTimeout(() => {
       console.log("Signed in with:", { candidateId, password });
       setCandidateId("");
       setPassword("");
       setLoading(false);
+      toast.success("Signed in successfully!", {
+        position: "top-center",
+        id: "signin-loading",
+        style: {
+          background: "#00C851",
+          color: "#fff",
+        },
+      });
+      router.push(`/sidebar`);
     }, 1500);
   };
 
