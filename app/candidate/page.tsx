@@ -1,13 +1,41 @@
 
-import SignInCandidate from '@/components/Signin-Candidate'
-import React from 'react'
+import DashboardLayout from '@/components/candidate/DashboardLayout';
 
-const page = () => {
-  return (
-    <div>
-      <SignInCandidate />
-    </div>
-  )
+export default function DashboardPage() {
+  return <DashboardLayout />;
 }
 
-export default page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import SignInCandidate from '@/components/Signin-Candidate'
+// import React from 'react'
+
+// const page = () => {
+//   return (
+//     <div>
+//       <SignInCandidate />
+//     </div>
+//   )
+// }
+
+// export default page
