@@ -1,62 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-
-interface Candidate {
-  name: string;
-  position: string;
-  image: string;
-  flag: string;
-  votes: number;
-  percentage: number;
-}
-
-interface Election {
-  type: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  status: 'ENDED' | 'ACTIVE' | 'PENDING';
-  pollingStation: string;
-  candidate: {
-    name: string;
-    image: string;
-  };
-}
+import ElectionCard from './ElectionCard';
+import { Candidate, Election } from '../types/election';
 
 const sponsoredCandidates: Candidate[] = [
-    {
-        name: 'George Denis Mavo',
-        position: 'SRC PRESIDENT (Hopeful)',
-        image: '/assets/candidate1.png',
-        flag: '/assets/flag1.png',
-        votes: 23,
-        percentage: 23.67
-      },
-      {
-        name: 'Sarah Ann Wilson',
-        position: 'GENERAL SECRETARY (Hopeful)',
-        image: '/assets/candidate2.png',
-        flag: '/assets/flag2.png',
-        votes: 45,
-        percentage: 33.57
-      },
-      {
-        name: 'Paul Simon Avera',
-        position: 'SRC PRESIDENT (Hopeful)',
-        image: '/assets/candidate6.png',
-        flag: '/assets/flag3.png',
-        votes: 17,
-        percentage: 17.89
-      },
-      {
-        name: 'John Van Pelt',
-        position: 'SRC TREASURER (Hopeful)',
-        image: '/assets/candidate4.png',
-        flag: '/assets/flag4.png',
-        votes: 64,
-        percentage: 84.34
-      }
+  {
+    name: 'George Denis Mavo',
+    position: 'SRC PRESIDENT (Hopeful)',
+    image: '/assets/candidate1.png',
+    flag: '/assets/flag1.png',
+    votes: 23,
+    percentage: 23.67
+  },
+  {
+    name: 'Sarah Ann Wilson',
+    position: 'GENERAL SECRETARY (Hopeful)',
+    image: '/assets/candidate2.png',
+    flag: '/assets/flag2.png',
+    votes: 45,
+    percentage: 33.57
+  },
+  {
+    name: 'Paul Simon Avera',
+    position: 'SRC PRESIDENT (Hopeful)',
+    image: '/assets/candidate6.png',
+    flag: '/assets/flag3.png',
+    votes: 17,
+    percentage: 17.89
+  },
+  {
+    name: 'John Van Pelt',
+    position: 'SRC TREASURER (Hopeful)',
+    image: '/assets/candidate4.png',
+    flag: '/assets/flag4.png',
+    votes: 64,
+    percentage: 84.34
+  }
 ];
 
 const electionData: Election[] = [
@@ -69,7 +49,7 @@ const electionData: Election[] = [
     pollingStation: 'Main Campus',
     candidate: {
       name: 'Robert Mercer',
-      image: '/assets/candidate5.png'
+      image: '/assets/flyer.jpg'
     }
   },
   {
@@ -81,13 +61,32 @@ const electionData: Election[] = [
     pollingStation: 'Main Campus',
     candidate: {
       name: 'Sarah Wilson',
-      image: '/assets/candidate2.png'
+      image: '/assets/campaign.jpeg'
+    }
+  },
+  {
+    type: 'GESA GENERAL ELECTIONS',
+    date: '07 Oct, 2023',
+    startTime: '8:00 AM',
+    endTime: '5:00 PM',
+    status: 'PENDING',
+    pollingStation: 'Main Campus',
+    candidate: {
+      name: 'Robert Mercer',
+      image: '/assets/election.jpeg'
     }
   }
 ];
 
 const pollingStations = ['Main Campus', 'Science Block', 'Engineering Block', 'Business School'];
 const electionTypes = ['SRC Elections', 'Department Elections', 'Course Rep Elections'];
+
+// Helper to map status
+function mapStatus(status: string): 'Active' | 'Ended' | 'Upcoming' {
+  if (status === 'ACTIVE') return 'Active';
+  if (status === 'ENDED') return 'Ended';
+  return 'Upcoming';
+}
 
 export default function Elections() {
   const [isVisible, setIsVisible] = useState(false);
@@ -135,7 +134,7 @@ export default function Elections() {
               <div className="relative w-full aspect-square mb-3">
                 <div className="absolute top-2 left-2 z-10">
                   <Image
-                    src={candidate.flag}
+                    src={candidate.flag || ''}
                     alt="Country flag"
                     className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
                     width={24}
@@ -143,7 +142,7 @@ export default function Elections() {
                   />
                 </div>
                 <div className="absolute top-2 right-2 z-10 bg-blue-400 px-2 py-0.5 rounded-full text-xs">
-                  {candidate.percentage.toFixed(1)}%
+                  {candidate.percentage?.toFixed(1) || 0}%
                 </div>
                 <div className="relative h-full w-full">
                   <Image
@@ -167,35 +166,16 @@ export default function Elections() {
       {/* Current Elections Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {electionData.slice(currentPage * 2, (currentPage + 1) * 2).map((election, index) => (
-          <motion.div
+          <ElectionCard
             key={index}
-            initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white rounded-xl p-6 shadow-sm"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-base font-medium text-gray-900">{election.type}</h3>
-              <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-medium">
-                Upcoming
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Image
-                src={election.candidate.image}
-                alt={election.candidate.name}
-                className="w-12 h-12 rounded-full object-cover"
-                width={48}
-                height={48}
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-900">{election.candidate.name}</p>
-                <button className="mt-2 px-4 py-1 bg-pink-50 text-pink-500 rounded-full text-xs font-medium hover:bg-pink-100 transition-colors">
-                  VOTE
-                </button>
-              </div>
-            </div>
-          </motion.div>
+            title={election.type}
+            description={`Polling Station: ${election.pollingStation}`}
+            bannerUrl={election.candidate.image}
+            openDate={new Date().toISOString()} // Replace with actual open date if available
+            endDate={new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toISOString()} // Example: 2 hours from now
+            status={mapStatus(election.status)}
+            onViewDetails={() => { }}
+          />
         ))}
       </section>
 
@@ -206,7 +186,7 @@ export default function Elections() {
           <select
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             value={searchParams.electionType}
-            onChange={(e) => setSearchParams({...searchParams, electionType: e.target.value})}
+            onChange={(e) => setSearchParams({ ...searchParams, electionType: e.target.value })}
           >
             <option value="">Select Election Type</option>
             {electionTypes.map((type, index) => (
@@ -217,12 +197,12 @@ export default function Elections() {
             type="date"
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             value={searchParams.dateOfElection}
-            onChange={(e) => setSearchParams({...searchParams, dateOfElection: e.target.value})}
+            onChange={(e) => setSearchParams({ ...searchParams, dateOfElection: e.target.value })}
           />
           <select
             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             value={searchParams.pollingStation}
-            onChange={(e) => setSearchParams({...searchParams, pollingStation: e.target.value})}
+            onChange={(e) => setSearchParams({ ...searchParams, pollingStation: e.target.value })}
           >
             <option value="">Select Polling Station</option>
             {pollingStations.map((station, index) => (
@@ -254,11 +234,10 @@ export default function Elections() {
                   <td className="py-4 text-gray-400 text-sm">{election.startTime}</td>
                   <td className="py-4 text-gray-400 text-sm">{election.endTime}</td>
                   <td className="py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      election.status === 'ENDED' ? 'bg-green-50 text-green-700' :
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${election.status === 'ENDED' ? 'bg-green-50 text-green-700' :
                       election.status === 'PENDING' ? 'bg-red-50 text-red-700' :
-                      'bg-yellow-50 text-yellow-700'
-                    }`}>
+                        'bg-yellow-50 text-yellow-700'
+                      }`}>
                       {election.status}
                     </span>
                   </td>
