@@ -2,12 +2,10 @@ export interface Candidate {
     name: string;
     position?: string;
     image: string;
-    flag?: string;
-    votes?: number;
-    percentage?: number;
 }
 
 export interface Election {
+    id: string;
     type: string;
     date: string;
     startTime: string;
