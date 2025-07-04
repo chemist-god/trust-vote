@@ -1,85 +1,10 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import ElectionCard from './ElectionCard';
-import { Candidate, Election } from '../types/election';
-
-const sponsoredCandidates: Candidate[] = [
-  {
-    name: 'George Denis Mavo',
-    position: 'SRC PRESIDENT (Hopeful)',
-    image: '/assets/candidate1.png',
-    flag: '/assets/flag1.png',
-    votes: 23,
-    percentage: 23.67
-  },
-  {
-    name: 'Sarah Ann Wilson',
-    position: 'GENERAL SECRETARY (Hopeful)',
-    image: '/assets/candidate2.png',
-    flag: '/assets/flag2.png',
-    votes: 45,
-    percentage: 33.57
-  },
-  {
-    name: 'Paul Simon Avera',
-    position: 'SRC PRESIDENT (Hopeful)',
-    image: '/assets/candidate6.png',
-    flag: '/assets/flag3.png',
-    votes: 17,
-    percentage: 17.89
-  },
-  {
-    name: 'John Van Pelt',
-    position: 'SRC TREASURER (Hopeful)',
-    image: '/assets/candidate4.png',
-    flag: '/assets/flag4.png',
-    votes: 64,
-    percentage: 84.34
-  }
-];
-
-const electionData: Election[] = [
-  {
-    type: 'GCTU GENERAL SRC ELECTIONS',
-    date: '07 Oct, 2023',
-    startTime: '8:00 AM',
-    endTime: '5:00 PM',
-    status: 'ENDED',
-    pollingStation: 'Main Campus',
-    candidate: {
-      name: 'Robert Mercer',
-      image: '/assets/flyer.jpg'
-    }
-  },
-  {
-    type: 'BSC COMPUTER SCIENCE COURSE REP ELECTION (GROUP A)',
-    date: '14 Oct, 2023',
-    startTime: '9:00 AM',
-    endTime: '4:00 PM',
-    status: 'ACTIVE',
-    pollingStation: 'Main Campus',
-    candidate: {
-      name: 'Sarah Wilson',
-      image: '/assets/campaign.jpeg'
-    }
-  },
-  {
-    type: 'GESA GENERAL ELECTIONS',
-    date: '07 Oct, 2023',
-    startTime: '8:00 AM',
-    endTime: '5:00 PM',
-    status: 'PENDING',
-    pollingStation: 'Main Campus',
-    candidate: {
-      name: 'Robert Mercer',
-      image: '/assets/election.jpeg'
-    }
-  }
-];
-
-const pollingStations = ['Main Campus', 'Science Block', 'Engineering Block', 'Business School'];
-const electionTypes = ['SRC Elections', 'Department Elections', 'Course Rep Elections'];
+import { electionData, sponsoredCandidates, pollingStations, electionTypes } from '../data/electionData';
+import ElectionDetail from './ElectionDetail'; 
 
 // Helper to map status
 function mapStatus(status: string): 'Active' | 'Ended' | 'Upcoming' {
@@ -89,19 +14,17 @@ function mapStatus(status: string): 'Active' | 'Ended' | 'Upcoming' {
 }
 
 export default function Elections() {
-  const [isVisible, setIsVisible] = useState(false);
   const [currentPage] = useState(0);
   const [searchParams, setSearchParams] = useState({
     electionType: '',
     dateOfElection: '',
     pollingStation: ''
   });
+  const [selectedElectionId, setSelectedElectionId] = useState<string | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
+      () => {},
       { threshold: 0.1 }
     );
 
@@ -117,64 +40,65 @@ export default function Elections() {
     };
   }, []);
 
+  if (selectedElectionId) {
+    return <ElectionDetail electionId={selectedElectionId} onBack={() => setSelectedElectionId(null)} />;
+  }
+
   return (
     <div className="flex flex-col space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Sponsored Ads Section */}
-      <section className="sponsored-section pt-4">
+      <section className="sponsored-section pt-4 overflow-hidden">
         <h5 className="text-sm text-gray-600 font-medium mb-6">Sponsored Ads</h5>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sponsoredCandidates.map((candidate, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex flex-col items-center bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all"
-            >
-              <div className="relative w-full aspect-square mb-3">
-                <div className="absolute top-2 left-2 z-10">
-                  <Image
-                    src={candidate.flag || ''}
-                    alt="Country flag"
-                    className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                    width={24}
-                    height={24}
-                  />
-                </div>
-                <div className="absolute top-2 right-2 z-10 bg-blue-400 px-2 py-0.5 rounded-full text-xs">
-                  {candidate.percentage?.toFixed(1) || 0}%
-                </div>
-                <div className="relative h-full w-full">
+        <div className="relative whitespace-nowrap">
+          <motion.div
+            className="gap-4 inline-flex"
+            animate={{
+              x: ["-100%", "0%"],
+            }}
+            transition={{
+              x: {
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear"
+              }
+            }}
+          >
+            {[...sponsoredCandidates, ...sponsoredCandidates].map((candidate, index) => (
+              <div
+                key={index}
+                className="flex-none w-32 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all"
+              >
+                <div className="relative w-full aspect-[4/3] mb-3">
                   <Image
                     src={candidate.image}
                     alt={candidate.name}
                     className="rounded-lg object-cover"
                     fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    sizes="256px"
                   />
                 </div>
+                <div className="text-center">
+                  <p className="text-[8px] text-gray-600">{candidate.position}</p>
+                  <h3 className="text-[9px] text-gray-600 mt-1">{candidate.name}</h3>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-600">{candidate.position}</p>
-                <h3 className="text-sm font-medium mt-1">{candidate.name}</h3>
-              </div>
-            </motion.div>
-          ))}
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* Current Elections Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {electionData.slice(currentPage * 2, (currentPage + 1) * 2).map((election, index) => (
+        {electionData.slice(currentPage * 3, (currentPage + 1) * 3).map((election) => (
           <ElectionCard
-            key={index}
+            key={election.id}
             title={election.type}
             description={`Polling Station: ${election.pollingStation}`}
             bannerUrl={election.candidate.image}
             openDate={new Date().toISOString()} // Replace with actual open date if available
             endDate={new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toISOString()} // Example: 2 hours from now
             status={mapStatus(election.status)}
-            onViewDetails={() => { }}
+            onViewDetails={() => setSelectedElectionId(election.id)}
           />
         ))}
       </section>
@@ -261,4 +185,3 @@ export default function Elections() {
   );
 }
 
-///display poster
