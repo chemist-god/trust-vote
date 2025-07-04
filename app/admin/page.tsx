@@ -1,11 +1,5 @@
-import React from 'react'
+import AdminDashboard from "@/components/admin/DashboardLayout";
 
-const page = () => {
-  return (
-    <div>
-      Welcime to Admin Page
-    </div>
-  )
+export default function AdminPage() {
+  return <AdminDashboard />;
 }
-
-export default page
