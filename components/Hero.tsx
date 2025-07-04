@@ -62,7 +62,7 @@ const Hero = () => {
                 </p>
                 
                   <MagicButton
-                  title="SIGN IN"
+                  title="GET STARTED"
                   icon={<FaLocationArrow />}
                   position='right'
                   />

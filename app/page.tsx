@@ -5,7 +5,12 @@ import { GiVote } from "react-icons/gi";
 import { IoIosPerson } from "react-icons/io";
 import { RiAdminFill } from "react-icons/ri";
 import { FaQuestion } from "react-icons/fa";
-
+import HowItWork from "@/components/HowItWork";
+import Footer from "@/components/Footer";
+import FeatureSection from "@/components/FeatureSection";
+import Category from "@/components/category";
+import AboutUs from "@/components/AboutUs";
+import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
   return (
@@ -21,7 +26,12 @@ export default function Home() {
           ]
         }/>
         <Hero />
-        
+        <HowItWork />
+        <FeatureSection />
+        <AboutUs />
+        <Category />
+        <Testimonials />
+        <Footer />
       </div>
     </main>
   );
