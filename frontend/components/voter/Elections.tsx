@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { FiAlertTriangle } from 'react-icons/fi';
 import ElectionCard from './ElectionCard';
 import { electionData, sponsoredCandidates, pollingStations, electionTypes } from '../../data/electionData';
 import ElectionDetail from './ElectionDetail'; 
@@ -14,6 +17,7 @@ function mapStatus(status: string): 'Active' | 'Ended' | 'Upcoming' {
 }
 
 export default function Elections() {
+  const { isConnected } = useAccount();
   const [currentPage] = useState(0);
   const [searchParams, setSearchParams] = useState({
     electionType: '',
@@ -39,6 +43,20 @@ export default function Elections() {
       }
     };
   }, []);
+
+  if (!isConnected) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-gray-50 rounded-xl">
+        <FiAlertTriangle className="w-16 h-16 text-yellow-400 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Connect Your Wallet</h2>
+        <p className="text-gray-600 mb-6 max-w-md">
+          To view and participate in elections, you need to connect your Web3
+          wallet. This ensures a secure and transparent voting process.
+        </p>
+        <ConnectButton />
+      </div>
+    );
+  }
 
   if (selectedElectionId) {
     return <ElectionDetail electionId={selectedElectionId} onBack={() => setSelectedElectionId(null)} />;
@@ -184,4 +202,3 @@ export default function Elections() {
     </div>
   );
 }
-
