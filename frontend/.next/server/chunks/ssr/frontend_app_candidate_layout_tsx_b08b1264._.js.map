@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/HP/trustvote/trustvote/frontend/app/candidate/layout.tsx"],"sourcesContent":["\r\n\r\nexport default function CandidateLayout({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <div className=\"candidate-layout\">\r\n      {/* <header>Candidate Header</header> */}\r\n      <main>{children}</main>\r\n      {/* <footer>Candidate Footer</footer> */}\r\n    </div>\r\n  );\r\n}"],"names":[],"mappings":";;;;;AAEe,SAAS,gBAAgB,EAAE,QAAQ,EAAiC;IACjF,qBACE,8OAAC;QAAI,WAAU;kBAEb,cAAA,8OAAC;sBAAM;;;;;;;;;;;AAIb","debugId":null}}]
+}
