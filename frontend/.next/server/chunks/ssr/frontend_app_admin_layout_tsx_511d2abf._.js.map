@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/HP/trustvote/trustvote/frontend/app/admin/layout.tsx"],"sourcesContent":["\r\n\r\nexport default function AdminLayout({ children }: { children: React.ReactNode }) {\r\n  return (\r\n    <div className=\"admin-layout\">\r\n      {/* <header>Admin Header</header> */}\r\n      <main>{children}</main>\r\n      {/* <footer>Admin Footer</footer> */}\r\n    </div>\r\n  );\r\n}"],"names":[],"mappings":";;;;;AAEe,SAAS,YAAY,EAAE,QAAQ,EAAiC;IAC7E,qBACE,8OAAC;QAAI,WAAU;kBAEb,cAAA,8OAAC;sBAAM;;;;;;;;;;;AAIb","debugId":null}}]
-}

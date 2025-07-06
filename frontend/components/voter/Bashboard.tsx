@@ -2,13 +2,14 @@
 import Elections from './Elections';
 import Notification from './Notification';
 import FAQ_Terms from '../FAQ-Terms';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   FiUser, FiShield, FiBell, FiBookOpen, FiMenu, FiLogOut,
 } from 'react-icons/fi';
-import WalletConnect from './WalletConnect';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
 
 interface DashboardProps {
   studentId: string;
@@ -31,8 +32,15 @@ export default function Dashboard({ studentId }: DashboardProps) {
   const [active, setActive] = useState<string>('user');
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
+  const { address, isConnected } = useAccount();
 
   const handleLogout = () => router.push('/');
+
+  useEffect(() => {
+    if (isConnected) {
+      console.log('Wallet address is now:', address);
+    }
+  }, [address, isConnected]);
 
   const renderMainContent = () => {
     if (active === 'user') {
@@ -60,14 +68,22 @@ export default function Dashboard({ studentId }: DashboardProps) {
 
               <div className="mt-8">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Wallet Address
+                  Wallet Connection
                 </label>
-                <WalletConnect 
-                  onAddressChange={(address) => {
-                    console.log('Wallet address changed:', address);
-                    // Handle address change here
-                  }}
-                /> 
+                <ConnectButton />
+                {isConnected ? (
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-700">
+                      Wallet connected. You can now proceed to the elections tab.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-700">
+                      Please connect your wallet to view elections and vote.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
