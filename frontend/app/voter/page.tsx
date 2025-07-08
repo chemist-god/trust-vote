@@ -1,15 +1,16 @@
-import SignIn from '@/components/SignIn'
+import Dashboard from '@/components/voter/Dashboard';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import React from 'react'
 
-const page = () => {
+const VoterPage = () => {
   return (
-    <div>
-        <SignIn/>
-    </div>
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
   )
 }
 
-export default page
+export default VoterPage
 
 // import { withRoleProtection } from '@/lib/authHelpers';
 
