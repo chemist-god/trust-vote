@@ -11,11 +11,3 @@ const VoterPage = () => {
 }
 
 export default VoterPage
-
-// import { withRoleProtection } from '@/lib/authHelpers';
-
-// function VoterDashboard() {
-//   return <div>Welcome to the Voter Dashboard</div>;
-// }
-
-// export default withRoleProtection(VoterDashboard, ['voter']);

@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Login - TrustVote',
-  description: 'Sign in to your TrustVote account',
+  description: 'Sign in with your studentID and your indexNumber as default password',
 };
 
 export default async function LoginPage() {
@@ -13,7 +13,7 @@ export default async function LoginPage() {
   const cookiesList = await cookies();
   const token = cookiesList.get('token')?.value;
   if (token) {
-    redirect('/voter/dashboard');
+    redirect('/dashboard');
   }
 
   return (

@@ -2,8 +2,7 @@
 import Bashboard from '@/components/voter/Bashboard'
 import React from 'react'
 
-export default function DashboardPage({ searchParams }: { searchParams: { studentId?: string } }) {
-  const studentId = searchParams.studentId || 'Unknown‑ID';
-  return <Bashboard studentId={studentId} />;
+export default function DashboardPage() {
+  return <Bashboard/>;
 }
 
