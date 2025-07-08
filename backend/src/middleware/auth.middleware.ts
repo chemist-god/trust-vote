@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-interface JwtPayload {
+interface UserPayload {
   studentId: number;
   indexHash: string;
 }
@@ -24,8 +24,10 @@ export const protect = async (
       throw new Error('JWT_SECRET is not set.');
     }
 
-    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
-    req.user = decoded;
+    const decoded = jwt.verify(token, jwtSecret) as UserPayload;
+    // We use a type assertion here to tell TypeScript about the 'user' property.
+    // This is necessary because the global type declaration is not being picked up.
+    (req as Request & { user: UserPayload }).user = decoded;
     next();
   } catch (err) {
     res.status(403).json({
