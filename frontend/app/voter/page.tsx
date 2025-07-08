@@ -1,4 +1,4 @@
-import Dashboard from '@/components/voter/Dashboard';
+import Dashboard from '@/components/voter/Bashboard';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import React from 'react'
 

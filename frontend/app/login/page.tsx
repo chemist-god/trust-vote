@@ -10,7 +10,8 @@ export const metadata: Metadata = {
 
 export default async function LoginPage() {
   // Check if user is already authenticated
-  const token = cookies().get('token')?.value;
+  const cookiesList = await cookies();
+  const token = cookiesList.get('token')?.value;
   if (token) {
     redirect('/voter/dashboard');
   }
