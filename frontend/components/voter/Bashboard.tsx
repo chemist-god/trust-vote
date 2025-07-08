@@ -13,9 +13,6 @@ import { useAccount } from 'wagmi';
 import { authApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 
-interface DashboardProps {
-  // No need for studentId prop as we'll get it from the token
-}
 
 type NavItem = {
   id: string;
@@ -30,7 +27,7 @@ const navItems: NavItem[] = [
   { id: 'faq', label: 'FAQ / Terms', icon: <FiBookOpen size={20} /> },
 ];
 
-export default function Dashboard({}: DashboardProps) {
+export default function Dashboard() {
   const [active, setActive] = useState<string>('user');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,9 +40,9 @@ export default function Dashboard({}: DashboardProps) {
 
   useEffect(() => {
     // Get user data from token
-    const token = localStorage.getItem('token');
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
     if (!token) {
-      router.push('/voter');
+      router.push('/voter/login');
       return;
     }
 
@@ -57,22 +54,24 @@ export default function Dashboard({}: DashboardProps) {
       });
     } catch (error) {
       console.error('Error decoding token:', error);
-      authApi.logout();
-      router.push('/voter');
+      // Clear invalid token
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      router.push('/voter/login');
     }
   }, [router]);
 
   const handleLogout = () => {
-    authApi.logout();
-    router.push('/voter');
+    // Clear the token cookie
+    document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    router.push('/voter/login');
   };
 
   useEffect(() => {
     const linkWalletToBackend = async (walletAddress: string) => {
-      const token = localStorage.getItem('token');
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
       if (!token) {
         setApiMessage({ type: 'error', text: 'Authentication error. Please log in again.' });
-        setTimeout(() => router.push('/voter'), 3000);
+        setTimeout(() => router.push('/voter/login'), 3000);
         return;
       }
 
@@ -83,7 +82,7 @@ export default function Dashboard({}: DashboardProps) {
         const response = await authApi.connectWallet(walletAddress);
         setApiMessage({ 
           type: 'success', 
-          text: response.data.message || 'Wallet connected successfully!' 
+          text: response.data?.message || 'Wallet connected successfully!' 
         });
         setIsWalletLinked(true);
       } catch (error: any) {

@@ -2,8 +2,13 @@
 import React, { useState } from 'react';
 import { FaUser, FaLock } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import { authApi, LoginCredentials } from '@/lib/api';
+import { authApi } from '@/lib/api';
 import toast from 'react-hot-toast';
+
+interface LoginCredentials {
+  indexNumber: string;
+  password: string;
+}
 
 const SignIn: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -26,31 +31,37 @@ const SignIn: React.FC = () => {
     
     if (!credentials.indexNumber.trim() || !credentials.password.trim()) {
       toast.error('Please fill in all fields', {
-        position: 'top-center',
+        position: 'bottom-right',
         style: { background: '#ff4444', color: '#fff' },
       });
       return;
     }
 
     setLoading(true);
-    const loadingToast = toast.loading('Signing in...', { position: 'top-center' });
+    const loadingToast = toast.loading('Signing in...', { position: 'bottom-right' });
 
     try {
       const response = await authApi.login(credentials);
       
-      toast.success('Signed in successfully!', {
-        position: 'top-center',
-        id: loadingToast,
-        style: { background: '#00C851', color: '#fff' },
-      });
-      
-      // Redirect based on user role or to dashboard
-      router.push('/voter/dashboard');
-      
+      if (response.token) {
+        // Set the token in cookies
+        document.cookie = `token=${response.token}; path=/;`;
+        
+        toast.success('Signed in successfully!', {
+          position: 'bottom-right',
+          id: loadingToast,
+          style: { background: '#00C851', color: '#fff' },
+        });
+        
+        // Redirect to dashboard
+        window.location.href = '/dashboard';
+      } else {
+        throw new Error('No token received');
+      }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to sign in';
+      const errorMessage = error.response?.data?.message || 'Failed to sign in. Please check your credentials.';
       toast.error(errorMessage, {
-        position: 'top-center',
+        position: 'bottom-right',
         id: loadingToast,
         style: { background: '#ff4444', color: '#fff' },
       });
