@@ -1,62 +1,62 @@
 "use client"
 import React, { useState } from 'react';
 import { FaUser, FaLock } from 'react-icons/fa';
-import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { authApi, LoginCredentials } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 const SignIn: React.FC = () => {
-  const [studentId, setStudentId] = useState('');
-  const [password, setPassword] = useState('');
+  const [credentials, setCredentials] = useState<LoginCredentials>({
+    indexNumber: '',
+    password: ''
+  });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!studentId.trim()) {
-      toast.error('Student ID cannot be empty', {
+    
+    if (!credentials.indexNumber.trim() || !credentials.password.trim()) {
+      toast.error('Please fill in all fields', {
         position: 'top-center',
-        style: {
-          background: '#ff4444',
-          color: '#fff',
-        },
-      });
-      return;
-    }
-
-    if (!password.trim()) {
-      toast.error('Password cannot be empty', {
-        position: 'top-center',
-        style: {
-          background: '#ff4444',
-          color: '#fff',
-        },
+        style: { background: '#ff4444', color: '#fff' },
       });
       return;
     }
 
     setLoading(true);
-    toast.loading('Signing in...', {
-      position: 'top-center',
-      id: 'signin-loading',
-    });
+    const loadingToast = toast.loading('Signing in...', { position: 'top-center' });
 
-    setTimeout(() => {
-      console.log('Signed in with:', { studentId, password });
-      setStudentId('');
-      setPassword('');
-      setLoading(false);
+    try {
+      const response = await authApi.login(credentials);
       
       toast.success('Signed in successfully!', {
         position: 'top-center',
-        id: 'signin-loading', 
-        style: {
-          background: '#00C851',
-          color: '#fff',
-        },
+        id: loadingToast,
+        style: { background: '#00C851', color: '#fff' },
       });
-      router.push(`/dashboard?studentId=${encodeURIComponent(studentId)}`);// Redirect to /dashboard after sign in
-    }, 1500);
+      
+      // Redirect based on user role or to dashboard
+      router.push('/voter/dashboard');
+      
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to sign in';
+      toast.error(errorMessage, {
+        position: 'top-center',
+        id: loadingToast,
+        style: { background: '#ff4444', color: '#fff' },
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,10 +69,11 @@ const SignIn: React.FC = () => {
           <div className="relative">
             <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
-              type="text" // Changed from number to text to handle input more gracefully
+              type="text"
+              name="indexNumber"
               placeholder="Student ID"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
+              value={credentials.indexNumber}
+              onChange={handleChange}
               disabled={loading}
               className="w-full py-3 pl-12 pr-4 rounded-lg bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
@@ -82,9 +83,10 @@ const SignIn: React.FC = () => {
             <FaLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="password"
+              name="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={credentials.password}
+              onChange={handleChange}
               disabled={loading}
               required
               className="w-full py-3 pl-12 pr-4 rounded-lg bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
