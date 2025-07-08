@@ -18,6 +18,19 @@ interface ConnectWalletRequest {
   walletAddress: string;
 }
 
+// Payload from the JWT, guaranteed to be on the request by the 'protect' middleware
+interface UserPayload {
+  studentId: number;
+  indexHash: string;
+}
+
+// Custom request type for authenticated routes to include the user payload
+interface AuthenticatedRequest<T = any> extends Request<{}, {}, T> {
+  // User is made optional here to be compatible with the base Express Request type.
+  // The `protect` middleware ensures it's present at runtime for protected routes.
+  user?: UserPayload;
+}
+
 class ApiError extends Error {
   constructor(public statusCode: number, message: string) {
     super(message);
@@ -38,9 +51,12 @@ const hashIndex = (index: string): string =>
 
 export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): Promise<void> => {
   try {
-    const { indexNumber, password } = req.body;
+    // Trim inputs to prevent whitespace issues
+    const indexNumber = req.body.indexNumber?.trim();
+    const password = req.body.password?.trim();
 
-    if (!indexNumber?.trim() || !password?.trim()) {
+    // Use the trimmed values for the check
+    if (!indexNumber || !password) {
       throw new ApiError(400, 'Index number and password are required.');
     }
 
@@ -72,7 +88,7 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): 
     res.status(200).json({
       success: true,
       token: `Bearer ${token}`,
-      isFirstLogin: await bcrypt.compare(indexNumber.trim(), student.password_hash),
+      isFirstLogin: await bcrypt.compare(indexNumber, student.password_hash),
       message: 'Logged in successfully.',
     });
   } catch (err) {
@@ -85,55 +101,50 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response): 
  * @route   PUT /api/auth/update-password
  * @access  Private
  */
-export const updatePassword = async (req: Request, res: Response): Promise<void> => {
-  const user = req.user;
-  if (!user) {
-    res.status(401).json({ message: 'Not authenticated' });
-    return;
-  }
-
-  const { studentId } = user;
-  const { oldPassword, newPassword } = req.body;
-
-  if (!oldPassword || !newPassword) {
-    res.status(400).json({ message: 'Old and new passwords are required.' });
-    return;
-  }
-
-  if (newPassword.length < 6) {
-     res.status(400).json({ message: 'Password must be at least 6 characters long.' });
-    return;
-  }
-
+export const updatePassword = async (
+  req: AuthenticatedRequest<UpdatePasswordRequest>,
+  res: Response
+): Promise<void> => {
   try {
-    // Get current password hash
+    // This check is necessary for TypeScript and provides runtime safety,
+    // even though the `protect` middleware should always add the user.
+    if (!req.user) {
+      throw new ApiError(401, 'Not authenticated.');
+    }
+    const { studentId } = req.user;
+    // Trim inputs to prevent whitespace issues
+    const oldPassword = req.body.oldPassword?.trim();
+    const newPassword = req.body.newPassword?.trim();
+
+    if (!oldPassword || !newPassword) {
+      throw new ApiError(400, 'Old and new passwords are required.');
+    }
+
+    if (newPassword.length < 6) {
+      throw new ApiError(400, 'Password must be at least 6 characters long.');
+    }
+
     const studentResult = await pool.query('SELECT password_hash FROM students WHERE id = $1', [studentId]);
 
     if (studentResult.rows.length === 0) {
-      res.status(404).json({ message: 'Student not found.' });
-      return;
+      throw new ApiError(404, 'Student not found.');
     }
 
     const student = studentResult.rows[0];
-
-    // Check if old password is correct
     const isMatch = await bcrypt.compare(oldPassword, student.password_hash);
+
     if (!isMatch) {
-      res.status(401).json({ message: 'Incorrect old password.' });
-      return;
+      throw new ApiError(401, 'Incorrect old password.');
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
     const newPasswordHash = await bcrypt.hash(newPassword, salt);
 
-    // Update password in DB
     await pool.query('UPDATE students SET password_hash = $1 WHERE id = $2', [newPasswordHash, studentId]);
 
     res.status(200).json({ success: true, message: 'Password updated successfully.' });
   } catch (err) {
-    console.error('Update password error:', err);
-    res.status(500).json({ message: 'Server error during password update.' });
+    handleError(err, res);
   }
 };
 
@@ -142,44 +153,39 @@ export const updatePassword = async (req: Request, res: Response): Promise<void>
  * @route   POST /api/auth/connect-wallet
  * @access  Private
  */
-export const connectWallet = async (req: Request, res: Response): Promise<void> => {
-  const user = req.user;
-  if (!user) {
-    res.status(401).json({ message: 'Not authenticated' });
-    return;
-  }
-
-  const { studentId } = user;
-  const { walletAddress } = req.body;
-
-  if (!walletAddress) {
-    res.status(400).json({ message: 'Wallet address is required.' });
-    return;
-  }
-
-  // Basic validation for wallet address format
-  if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-    res.status(400).json({ message: 'Invalid wallet address format.' });
-    return;
-  }
-
+export const connectWallet = async (
+  req: AuthenticatedRequest<ConnectWalletRequest>,
+  res: Response
+): Promise<void> => {
   try {
-    // Check if wallet is already linked to another student
+    // This check is necessary for TypeScript and provides runtime safety.
+    if (!req.user) {
+      throw new ApiError(401, 'Not authenticated.');
+    }
+    const { studentId } = req.user;
+    const { walletAddress } = req.body;
+
+    if (!walletAddress) {
+      throw new ApiError(400, 'Wallet address is required.');
+    }
+
+    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      throw new ApiError(400, 'Invalid wallet address format.');
+    }
+
     const existingWallet = await pool.query('SELECT id FROM students WHERE wallet_address = $1 AND id != $2', [
       walletAddress,
       studentId,
     ]);
+
     if (existingWallet.rows.length > 0) {
-      res.status(409).json({ message: 'This wallet address is already linked to another student.' });
-      return;
+      throw new ApiError(409, 'This wallet address is already linked to another student.');
     }
 
-    // Update student record with wallet address
     await pool.query('UPDATE students SET wallet_address = $1 WHERE id = $2', [walletAddress, studentId]);
 
     res.status(200).json({ success: true, message: 'Wallet connected successfully.' });
   } catch (err) {
-    console.error('Connect wallet error:', err);
-    res.status(500).json({ message: 'Server error during wallet connection.' });
+    handleError(err, res);
   }
 };
