@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { pool } from './db';
 import authRoutes from './routes/auth.routes';
+import electionRoutes from './routes/election.routes';
 
 dotenv.config();
 
@@ -29,6 +30,8 @@ app.get('/', async (_req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/elections', electionRoutes);
+
 
 // Error handling middleware
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
