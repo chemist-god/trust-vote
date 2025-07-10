@@ -5,9 +5,14 @@ import { getElections } from '../controllers/election.controller';
 
 const router = express.Router();
 
-// POST /api/elections/create
-router.post('/create', createElection);
-router.post('/elections', authenticateJWT, adminOnly, createElection);
-router.get('/elections', getElections);
+// POST /api/elections
+router.post('/', createElection);
+
+// POST /api/elections (with auth)
+router.post('/', authenticateJWT, adminOnly, createElection);
+
+// GET /api/elections
+router.get('/', getElections);
 
 export default router;
+

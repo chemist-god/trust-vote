@@ -46,9 +46,7 @@ export const createElection = async (req: Request, res: Response): Promise<void>
 export const getElections = async (req: Request, res: Response): Promise<void> => {
   try {
     const result = await pool.query(
-      `SELECT * FROM elections
-       WHERE start_date <= NOW() AND end_date >= NOW()
-       ORDER BY start_date ASC`
+      `SELECT * FROM elections ORDER BY start_date DESC`
     );
 
     res.status(200).json({ elections: result.rows });
