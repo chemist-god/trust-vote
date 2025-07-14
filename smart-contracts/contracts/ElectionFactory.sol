@@ -12,6 +12,7 @@ contract ElectionFactory {
         uint endDate;
         string bannerUrl;
         address createdBy;
+        uint createdAt;
     }
 
     mapping(uint => Election) public elections;
@@ -23,7 +24,8 @@ contract ElectionFactory {
         uint startDate,
         uint endDate,
         string bannerUrl,
-        address indexed createdBy
+        address indexed createdBy,
+        uint createdAt
     );
 
     function createElection(
@@ -37,24 +39,29 @@ contract ElectionFactory {
         require(_startDate > block.timestamp, "Start date must be in the future");
 
         electionCount++;
-        elections[electionCount] = Election({
-            id: electionCount,
+        uint electionId = electionCount;
+        uint timestamp = block.timestamp;
+
+        elections[electionId] = Election({
+            id: electionId,
             name: _name,
             description: _description,
             startDate: _startDate,
             endDate: _endDate,
             bannerUrl: _bannerUrl,
-            createdBy: msg.sender
+            createdBy: msg.sender,
+            createdAt: timestamp
         });
 
         emit ElectionCreated(
-            electionCount,
+            electionId,
             _name,
             _description,
             _startDate,
             _endDate,
             _bannerUrl,
-            msg.sender
+            msg.sender,
+            timestamp
         );
     }
 
