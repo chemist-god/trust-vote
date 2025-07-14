@@ -7,7 +7,6 @@ dotenv.config();
 const listenToElectionEvents = async () => {
   console.log('📡 Listening for ElectionCreated events...');
 
-  // Listen for new ElectionCreated events
   electionFactory.on(
     'ElectionCreated',
     async (
@@ -23,7 +22,6 @@ const listenToElectionEvents = async () => {
       console.log(`🆕 New Election Event → ID: ${id}, Name: ${name}`);
 
       try {
-        // Save to PostgreSQL, convert timestamps from seconds to TIMESTAMP
         await pool.query(
           `INSERT INTO elections (
               election_id,
@@ -39,14 +37,14 @@ const listenToElectionEvents = async () => {
           )
           ON CONFLICT (election_id) DO NOTHING`,
           [
-            id.toNumber(),             // election_id
-            name,                      // name
-            description,               // description
-            startDate.toNumber(),      // start_date (UNIX to TIMESTAMP)
-            endDate.toNumber(),        // end_date (UNIX to TIMESTAMP)
-            bannerUrl,                 // banner_url
-            createdBy,                 // creator_address
-            createdAt.toNumber()       // created_at (from blockchain timestamp)
+            id,            // election_id (already a number)
+            name,
+            description,
+            startDate,     // UNIX timestamp
+            endDate,       // UNIX timestamp
+            bannerUrl,
+            createdBy,
+            createdAt      // UNIX timestamp from blockchain
           ]
         );
 
