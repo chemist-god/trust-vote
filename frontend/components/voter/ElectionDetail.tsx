@@ -1,45 +1,25 @@
 'use client';
 import React from 'react';
-import { electionData } from '../../data/electionData';
 import Image from 'next/image';
 import { FiArrowLeft, FiCheckCircle, FiBookmark, FiInfo, FiAward, FiLock } from 'react-icons/fi';
 
+interface Election {
+  id: string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  bannerUrl?: string;
+  status: 'ACTIVE' | 'UPCOMING' | 'ENDED';
+  createdBy: string;
+}
+
 interface ElectionDetailProps {
-  electionId: string;
+  election: Election;
   onBack: () => void;
 }
 
-// Mock candidates for display purposes
-const mockCandidates = [
-  {
-    name: 'Alice Williams',
-    position: 'Computer Science',
-    image: '/assets/candidate1.png',
-  },
-  {
-    name: 'Robert Johnson',
-    position: 'Computer Science',
-    image: '/assets/candidate2.png',
-  },
-  {
-    name: 'Emily Brown',
-    position: 'Computer Science',
-    image: '/assets/candidate6.png',
-  },
-  {
-    name: 'Michael Davis',
-    position: 'Computer Science',
-    image: '/assets/candidate4.png',
-  },
-];
-
-const ElectionDetail: React.FC<ElectionDetailProps> = ({ electionId, onBack }) => {
-  const election = electionData.find((e) => e.id === electionId);
-
-  if (!election) {
-    return <div>Election not found</div>;
-  }
-
+const ElectionDetail: React.FC<ElectionDetailProps> = ({ election, onBack }) => {
   const isLive = election.status === 'ACTIVE';
 
   const voterStatus = [
@@ -58,8 +38,8 @@ const ElectionDetail: React.FC<ElectionDetailProps> = ({ electionId, onBack }) =
       </button>
 
       <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">{election.type}</h1>
-        <p className="text-gray-500 mt-2">{election.date}</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">{election.name}</h1>
+        <p className="text-gray-500 mt-2">{new Date(election.startDate).toLocaleDateString()}</p>
         <span
           className={`mt-4 inline-block px-4 py-1.5 rounded-full text-sm font-medium ${isLive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
           {isLive ? 'Ongoing' : election.status}
@@ -71,30 +51,12 @@ const ElectionDetail: React.FC<ElectionDetailProps> = ({ electionId, onBack }) =
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-2xl font-semibold mb-2">Approved Candidates</h2>
-            <p className="text-gray-600 mb-6">Election for the position of {election.type}. Vote for the candidate of your choice.</p>
+            <p className="text-gray-600 mb-6">No candidates yet. (To be implemented)</p>
+            {/* Placeholder for candidate list */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Display multiple candidates */}
-              {mockCandidates.map((candidate, index) => (
-                <div key={index} className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                  <div className="w-24 h-24 mx-auto mb-4 relative">
-                    <Image
-                      src={candidate.image}
-                      alt={candidate.name}
-                      fill
-                      className="object-cover rounded-full"
-                    />
-                  </div>
-                  <h3 className="text-lg font-bold">{candidate.name}</h3>
-                  <p className="text-gray-500 text-sm mb-4">{candidate.position}</p>
-                  {/* <button className="w-full py-2 px-4 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm mb-2">
-                    Manifesto
-                  </button> */}
-                  <button
-                    className={`w-full py-2 px-4 rounded-lg text-white font-semibold text-sm transition-colors ${isLive ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'}`}>
-                    Vote
-                  </button>
-                </div>
-              ))}
+              <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 text-center text-gray-400">
+                No candidates available.
+              </div>
             </div>
           </div>
         </div>
